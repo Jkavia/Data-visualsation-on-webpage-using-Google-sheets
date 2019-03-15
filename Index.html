@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!--google scripts-->
+  <script src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  
+  <!--  Maps -->
+   <script async defer src="https://maps.googleapis.com/maps/api/js?key=**google maps api**"
+  type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  
+  <!-- word cloud  -->
+  	<script src= "https://cdn.zingchart.com/zingchart.min.js"></script>
+		<script> zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
+		ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9","ee6b7db5b51705a13dc2339db3edaf6d"];</script>
+        
+ <!--  bootstrap -->      
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<!-- flight connection js-->
+ <script src="https://api.mqcdn.com/sdk/mapquest-gl-js/v0.4.0/mapquest-gl.js"></script>
+ <link type="text/css" rel="stylesheet" href="https://api.mqcdn.com/sdk/mapquest-gl-js/v0.4.0/mapquest-gl.css"/>
+
+
+<!--  bootstrap -->   
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<style>
+#myBtn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  z-index: 99;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+#myBtn:hover {
+  background-color: #555;
+}
+
+.chart {
+  width: 100%; 
+  min-height: 450px;
+}
+
+.container-fluid { 
+  padding: 0px;
+}
+</style>
+</head>
+
+<body>
+<!--Navbar-->
+<!---->
+<div class="container-fluid">
+<div class="row">
+    <div class="col-sm-12">
+    
+<nav id ="navbar" class="navbar navbar-expand-lg navbar-fixed-top navbar-dark bg-dark">
+  <a class="navbar-brand" href="#"><img style="height:40px;width:45px;" src="https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/I/m/Altimetrik_logo.png">Playground Dashboard</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#main">BarChart <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#NetWorkDiagram">AirNetwork</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#pieUsecases">PieChart</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#myChartHeading">WordCloud</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#chart_div">Events Map</a>
+      </li>
+       <li class="nav-item">
+        <a class="nav-link" href="#calendarheading">Calendar</a>
+      </li>
+    </ul>
+    <form id="searchForm" class="form-inline my-2 my-lg-0" action="javascript:search();">
+      <input id="form-element" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" onclick="document.getElementById('searchForm').submit(); return false;" type="button">Search</button>
+    </form>
+  </div>
+</nav>
+</div>
+</div>
+
+<!--Bar Chart-->
+<div class="row">
+    <div class="col-sm-12">
+    
+ <div class="classOfHeading" id="barchart" ><h1 style="text-align:center"><p>Attendees By Primary Skill</p></h1></div>
+  <div id="main" class="chart" style="height:500px;margin-top:0px;"></div>
+  
+</div>
+</div>
+<!-- Air connection map-->
+
+<div class="row">
+    <div class="col-sm-12">
+    
+<div class="classOfHeading" id="NetWorkDiagram"><h1 style="text-align:center"><p>Origin and Destination Network For Playground Participants</p></h1></div> 
+<div id="map" style="width: 100%; height: 530px;"></div>
+
+</div>
+</div>
+<!--Miles Traveled-->
+<div class="jumbotron jumbotron-fluid">
+  <div class="classOfHeading" class="container"  style="text-align:center">
+    <h1 class="display-4" ><b id="miles"></b></h1>
+    <p class="lead">Cumulative number of miles participants traveled to attend Playground events.</p>
+  </div>
+</div>
+
+<!-- Calendar -->
+<div class="row">
+    <div class="col-sm-12">
+    
+<div class="classOfHeading" id="calendarheading"><h1 style="text-align:center"><p>No. of Participants by Date</p></h1></div>
+<div id="calendar" style="display:block;margin-left:10%;" class="chart" ></div>
+
+</div>
+</div>
+<!--wordcloud-->
+<div class="row">
+
+    <div class="col-sm-12">
+    
+<div class="classOfHeading" id="myChartHeading"><h1 style="text-align:center"><p>Most Popular Technologies</p></h1></div>
+<div id="myChart"></div>
+</div>
+</div>
+<!--Pie Chart-->
+<div class="row">
+    <div class="col-sm-12">
+    
+ <div class="classOfHeading" id="pieUsecases"><h1 style="text-align:center"><p>Use Cases By Domain</p></h1></div>
+  <div id="donutchart" class="chart" style="height:500px"></div>
+  
+  </div>
+</div>
+<!--Map with bubbles-->  
+<div class="row">
+    <div class="col-sm-12">
+    
+  <div class="classOfHeading" id="plgheading"><h1 style="text-align:center"><p>Number of Participants in Playground sessions</p></h1></div> 
+<div class="chart" id="chart_div"></div>
+
+  
+  </div>
+</div>
+</div>
+  <script>
+  //onscroll go to top
+  window.onscroll = function() {scrollFunction()};
+
+//search
+function search() {
+ 
+   var name = document.getElementById("searchForm").elements["form-element"].value;
+   var pattern = name.toLowerCase();
+   console.log(pattern);
+   var targetId = "";
+ 
+   var divs = document.getElementsByClassName("col-sm-12");
+    //console.log(divs[3].getElementsByClassName("classOfHeading"));
+   for (var i = 1; i < divs.length; i++) {
+   if(i==2){continue;}
+      var para = divs[i].getElementsByClassName("classOfHeading")[0].childNodes[0].childNodes[0].childNodes[0].data; //getElementsByTagName("h1");
+     console.log(para.toLowerCase());
+      var index = para.toLowerCase().indexOf(pattern);
+     console.log(index);
+      if (index != -1) {
+      console.log(divs[i].getElementsByClassName("classOfHeading"));
+         targetId = divs[i].getElementsByClassName("classOfHeading")[0].attributes[1].nodeValue;
+         document.getElementById(targetId).scrollIntoView();
+         break;
+      }
+   }  
+}
+
+
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    document.getElementById("myBtn").style.display = "block";
+  } else {
+    document.getElementById("myBtn").style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
+
+  //navbar clicks to get div
+  $('ul.nav').find('a').click(function(){
+    var $href = $(this).attr('href');
+    var $anchor = $('#'+$href).offset();
+    window.scrollTo($anchor.left,$anchor.top);
+    return false;
+});
+
+    google.load('visualization', '1', {
+      packages: ['corechart', 'bar','geochart','calendar', 'map'] 
+    });
+
+    google.setOnLoadCallback(getSpreadsheetData);
+
+    //sartup funciton
+    function getSpreadsheetData() {
+    console.log("called");
+     
+      google.script.run.withSuccessHandler(drawChart).getSpreadsheetDataForBarChart();
+      google.script.run.withSuccessHandler(drawMap).getSpreadsheetDataForMap();
+      google.script.run.withSuccessHandler(drawpieChart).getSpreadsheetDataForPieChart();
+      google.script.run.withSuccessHandler(milesTraveled).getSpreadsheetMiles();
+     google.script.run.withSuccessHandler(drawCalendar).getSheetForCalender();
+     google.script.run.withSuccessHandler(getMapConnection).getSheetForMapConnection();
+     google.script.run.withSuccessHandler(getWordCloud).getSheetForWordCloud();
+      
+    }
+
+
+//function for the word cloud
+function getWordCloud(rows){
+     //code for word cloud
+      var arr=new Array();
+      for(var i=1;i<rows.length;i++){
+      arr.push(rows[i][0]);
+      }
+     // console.log(arr);
+   
+
+// internal code for word cloud
+ var myConfig = {
+ "height":600,
+"graphset":[
+{
+"type":"wordcloud",
+"options":{
+  "style":{
+    "tooltip":{
+      visible: true,
+      text: '%text: %hits'
+    }
+  },
+  "rotate":true,
+"text":arr.toString()
+}
+}
+]
+};
+ 
+zingchart.render({ 
+	id: 'myChart', 
+	data: myConfig});
+}
+
+
+
+
+
+//function to get map connections 
+function getMapConnection(rowsA){
+
+
+//code for storing the instances of each city
+         var hashmap = new Map();
+          for(i=1;i<rowsA.length;i++){
+          if(hashmap.has(rowsA[i][3])){
+          var cnt = hashmap.get(rowsA[i][3]).count;
+          cnt++;
+         var lng = hashmap.get(rowsA[i][3]).lng;
+         var lat = hashmap.get(rowsA[i][3]).lat;
+          hashmap.set(rowsA[i][3],{"count":cnt, "lng":lng, "lat":lat});
+          }else{
+          hashmap.set(rowsA[i][3],{"count":1, "lng":rowsA[i][4], "lat":rowsA[i][5]});
+          };
+          };
+         
+     
+
+ //code ends
+
+        var map = new mqgl.Map('map', 'lYrP4vF3Uk5zgTiGGuEzQGwGIVDGuy24');
+      map.load(function() {
+            for(i=1;i<rowsA.length;i++){
+            
+             var lng = parseFloat(rowsA[i][1]);
+            var lat = parseFloat(rowsA[i][2]);
+           // console.log(lng);
+            map.draw.circle([lng, lat],20,'#9BE278');
+            map.draw.line([[rowsA[i][4],rowsA[i][5]], [lng,lat ]],'black',1);
+            };  
+            
+               for (var [key, value] of hashmap) {
+     console.log(key+" count"+value.count+" lng"+value.lng+" lat"+value.lat);
+     var lng = value.lng;
+     var lat = value.lat;
+     var count = value.count;
+           map.draw.circle([parseFloat(lng),parseFloat(lat)],parseInt(count)*15, 'red');
+           map.icons.marker.addWithPopup({ lng: parseFloat(lng), lat:parseFloat(lat)}, 'marker-sm.png', key);
+            };
+         // map.draw.circle([-122.420168, 37.78008],40, 'red');
+          //map.draw.circle([-83.0458,42.332916], 60, 'red');
+           //map.icons.marker.addWithPopup({ lng: -122.420168, lat:37.78008 }, 'marker-sm.png', 'San Francisco,CA 40 Participants');
+           //map.icons.marker.addWithPopup({ lng: -83.0458, lat: 42.332916 }, 'marker-sm.png', 'Detroit,MI 60 Participants');
+          map.fitBounds();
+        });
+        };
+     
+
+//#8D6F47',
+
+// code for Draw Calendar
+    function drawCalendar(rows){
+ 
+        var data = new google.visualization.DataTable();
+        data.addColumn({ type: 'date', id: 'Date' });
+        data.addColumn({ type: 'number', id: 'Density' });       
+        for(var i = 0; i<rows.length;i++){
+        
+          
+          var year  = rows[i][0].split("-")[2];
+          var day  = rows[i][0].split("-")[1];
+          var month   = parseInt(rows[i][0].split("-")[0])-1;
+          
+          
+          data.addRow([
+              new Date(year,month,day),parseInt(rows[i][1])]);
+              
+             // console.log(rows[i][j] + " " + rows[i][j+1] );
+         }
+ 
+        var chart = new google.visualization.Calendar(document.getElementById('calendar'));
+           
+       var options = {
+         title: "Calendar",
+         height: 350,
+         noDataPattern: {
+           backgroundColor: '#9BE278',
+         },
+         calendar: {
+          cellColor: {
+             color: 'Green',
+             stroke: 'Black', 
+             strokeOpacity: 0,
+             strokeWidth: 10,
+          }}
+       };
+       
+        chart.draw(data, options);
+        
+     }
+
+
+// code for miles travelled
+     function milesTraveled(miles){
+    // console.log(miles);
+     document.getElementById('miles').innerHTML ="Miles Traveled : "+miles.toString();
+     }
+     
+     
+     
+    //code to draw a pie chart
+    function drawpieChart(rows){
+   // console.log("pie"+rows);
+     var options = {
+          animation: {"startup": true},
+         // title: 'Use cases by domain',
+          pieHole: 0.4,
+        };
+        
+         var data = google.visualization.arrayToDataTable(rows, false);
+    var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
+    }
+
+
+//code for drawing a bar chart
+    function drawChart(rows) {
+  
+      var options = {
+        //title: 'Attendees by primary skill',
+        legend: 'none',
+        animation: {"startup": true},
+        colors:['#9BE278'],
+        height:400,
+        chartArea: {
+          width: '30%',
+          height: 400
+        },
+        hAxis: {
+        textPosition:'out',
+          textStyle: {
+            fontFamily: 'Arial',
+            fontSize: 12
+          }
+        }
+      };
+        //console.log(rows);
+      var data = google.visualization.arrayToDataTable(rows, false);
+      data.sort({column: 1, desc: true});
+        chart = new google.visualization.BarChart(document.getElementById("main"));
+
+      chart.draw(data, options);
+    }
+    
+    
+    
+    //function for map to show attendees density
+    function drawMap(rows){
+    
+   // console.log(rows);
+     var data2 = google.visualization.arrayToDataTable(rows, false);
+       var options = {
+        region: 'US',
+        displayMode: 'markers',
+        height: 500,
+        width: 1200,
+        sizeAxis: { minSize: 6, maxSize:20},
+        resolution:'provinces',
+        animation: {"startup": true},
+       // backgroundColor:'black',
+        datalessRegionColor:'#E8E1E1',
+        colorAxis: {minValue : 0, maxValue : 30,colors: ['green','Yellow', 'Red']}
+      };
+     var chart2 = new google.visualization.GeoChart(document.getElementById('chart_div'));
+      chart2.draw(data2, options);
+      }
+      
+
+  </script>
+  <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+</body>
+
+</html>
+
